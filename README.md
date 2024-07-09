@@ -3,15 +3,23 @@
 Стек: HTML, SCSS, TS, Webpack
 
 Структура проекта:
-- src/ — исходные файлы проекта
-- src/components/ — папка с JS компонентами
-- src/components/base/ — папка с базовым кодом
+ - src
+   - /common.blocks - папка со стилями компонентов
+   - /components - папка с JS компонентами
+     - /base - папка с базовым кодом
+   - /images - папка с изображениями
+   - /pages - папка с главным index.html
+   - /public - папка с иконками и прочима ассетами
+   - /scss - папка со стилями
+   - /types - папка с типами
+   - /utils - папка с утилитами
+   - /vendor - папка со шрифтами и нормализацией css
 
 Важные файлы:
 - src/pages/index.html — HTML-файл главной страницы
-- src/types/index.ts — файл с типами
+- src/types/index.ts — корневой файл типов
 - src/index.ts — точка входа приложения
-- src/styles/styles.scss — корневой файл стилей
+- src/scss/styles.scss — корневой файл стилей
 - src/utils/constants.ts — файл с константами
 - src/utils/utils.ts — файл с утилитами
 
@@ -71,17 +79,17 @@ yarn build
 ### View и Model классы
 #### Model
 `CatalogModel` работа с данными для каталога продуктов.
-Имеет возможность добавлять, отдавать все данные и отфильтрованые по id.
+Имеет возможность добавлять, отдавать все данные и отфильтрованные по id.
+
 ```ts
 interface ICatalogModelConstructor {
-    new (events: IEvents): ICatalogModel;
+    new (events: IEvents): ICatalogModel; // получает объект событий
 }
 
 interface ICatalogModel {
-    items: ProductItem[];
-    setItems(items: ProductItem[]): void;
-    getItem(id: string): ProductItem;
-    getItemsByIds(ids: string[]): void;
+    items: IProductItem[]; // возвращает все данные каталога
+    setItems(items: IProductItem[]): void; // устанавливает данные с полной заменой
+    getItemsByIds(ids: string[]): void; // получение данных по массиву IDs
 }
 ```
 
@@ -90,13 +98,13 @@ interface ICatalogModel {
 Имеет возможность добавлять, отдавать, очищать данные.
 ```ts
 interface ICartModelConstructor {
-    new (events: IEvents): ICartModel;
+    new (events: IEvents): ICartModel; // получает объект событий
 }
 
 interface ICartModel {
-    add(id: string): void;
-    remove(id: string): void;
-    getItems(): string[]
+	items: string[]; // возвращает массив ID
+    add(id: string): void; // добавляет данные в корзину
+    remove(id: string): void; // удаляет данные по ID
 }
 ```
 
@@ -105,47 +113,51 @@ interface ICartModel {
 Имеет возможность добавлять, удалять, отдавать, очищать данные.
 ```ts
 interface IOrderModelConstructor {
-    new (events: IEvents): IOrderModel;
+    new (events: IEvents): IOrderModel; // получает объект событий
 }
 
 interface IOrderModel {
-    order: Order;
-    addItem(id: string): void;
-    removeItem(id: string): void;
-    resetOrder(): void;
+    order: IOrder; // возвращает объект заказа
+    addItem(id: string): void; // добавляет данные в заказ
+    resetOrder(): void; // очистка заказа
 }
 ```
 
 #### View
 
 `CatalogView` компонент для отображения каталога и его содержимого.
-Принимает карточки и встраивает их в DOM.
 ```ts
 
 interface ICatalogView {
-    render(items: HTMLElement[]): void;
+    render(items: HTMLElement[]): void; // принимает карточки и встраивает их в DOM.
 }
 ```
 
 `CatalogItemView` компонент для отображения продукта в каталоге. По клику открывается модалка с полной карточкой продукта.
 ```ts
 interface ICatalogItemConstructorView {
-    new (data: { onClick: () => void, data: ProductItem }): ICatalogItemView;
+    new (data: {
+        onClick: () => void, // коллбэк нажатия на карточку
+        data: IProductItem, // данные карточки
+    }): ICatalogItemView;
 }
 
 interface ICatalogItemView {
-    render(): HTMLElement;
+    render(): HTMLElement; // возвращает html элемент карточки каталога
 }
 ```
 
 `ProductItemView` компонент для отображения карточки продукта. Имеет кнопку для добавления в корзину.
 ```ts
 interface IProductItemConstructorView {
-	new (data: { addToCart: () => void, data: ProductItem }): IProductItemView;
+    new (data: {
+        addToCart: () => void, // коллбэк добавления карточки в корзину
+        data: IProductItem, // данные карточки каталога
+    }): IProductItemView;
 }
 
 interface IProductItemView {
-    render(): HTMLElement;
+    render(): HTMLElement; // возвращает html элемент карточки
 }
 ```
 
@@ -153,30 +165,34 @@ interface IProductItemView {
 Принимает элементы и встраивает их в DOM.
 ```ts
 interface ICartView {
-    render(data: { items: HTMLElement[] }): void;
+    render(items: HTMLElement[]): void; // принимает html элементы корзины и встраивает их в DOM.
 }
 ```
 
 `CartItemView` компонент для отображения добавленного элемента корзины. 
 ```ts
 interface ICartItemConstructorView {
-    new (data: { deleteItem: () => void, data: ProductItem }): ICartItemView;
+    new (data: {
+        deleteItem: () => void, // коллбэк удаления элемента из корзины
+        data: IProductItem, // данные элемента корзины
+    }): ICartItemView;
 }
 
 interface ICartItemView {
-    render(): void;
+    render(): HTMLElement; // возвращает html элемент пункта корзины
 }
 ```
 
 `ICartButtonView` компонент для отображения кнопки корзины.
-Отображает количество добавленный елементов и при нажатии открывает модальное окно.
+Отображает количество добавленный элементов и при нажатии открывает модальное окно.
 ```ts
 interface ICartButtonConstructorView {
     new (data: { onClick: () => void }): ICartButtonView;
+    // принимает коллбэк клика по элементу
 }
 
 interface ICartButtonView {
-    render(count: number): void;
+    render(count: number): void; // обновляет отображение количества добавленных елементов в корзину
 }
 ```
 
@@ -184,21 +200,24 @@ interface ICartButtonView {
 Получает массив ключей формы и по ним отображает поля.
 ```ts
 interface IOrderFormView {
-    render(data: (keyof OrderForm)[]): HTMLElement;
+    render(data: (keyof IOrderForm)[]): HTMLElement; // возвращает html элементы формы по получаемы ключам
 }
 ```
 
 `SuccessOrder` компонент подтверждения, что заказ выполнен успешно.
 ```ts
 interface ISuccessOrder {
-    render(sum: number): HTMLElement;
+    render(sum: number): HTMLElement; // получает сумму и выводит элемент
 }
 ```
 
 `ModalView` компонент отображения модального окна.
 ```ts
 interface IModalView {
-    open(data: { title: string; content: HTMLElement, next: { onClick: () => void; title: string } }): void;
+    // метод открытия модального окна
+    // получает заголовок модального окна, контент и кнопку и поэтим данным отображает элемент
+    open(data: { title: string; content: HTMLElement, next?: { onClick: () => void; title: string } }): void;
+    // закрывает модальное окно
     close(): void;
 }
 ```
@@ -211,7 +230,7 @@ interface IModalView {
 ### Api
 ```ts
 
-export type ProductItem = {
+export interface IProductItem {
     category: string;
     description: string;
     id: string;
@@ -220,12 +239,12 @@ export type ProductItem = {
     title: string;
 }
 
-export type ProductResponse = {
-    items: ProductItem[];
+export interface IProductResponse {
+    items: IProductItem[];
     total: number;
 }
 
-export type Order = {
+export interface IOrder {
     items: string[];
     payment: string;
     total: number;
@@ -234,18 +253,18 @@ export type Order = {
     phone: string;
 }
 
-export type OrderRequest = Order
+export interface IOrderRequest extends IOrder {}
 
-export type OrderResponse = {
+export interface IOrderResponse {
     id: string;
     total: number;
 }
 ```
 
-### Common
+### Other
 
 ```ts
-export type OrderForm = {
+export interface IOrderForm {
     payment: string;
     address: string;
     email: string;

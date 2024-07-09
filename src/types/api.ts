@@ -1,5 +1,4 @@
-
-export type ProductItem = {
+export interface IProductItem {
 	category: string;
 	description: string;
 	id: string;
@@ -8,12 +7,12 @@ export type ProductItem = {
 	title: string;
 }
 
-export type ProductResponse = {
-	items: ProductItem[];
+export interface IProductResponse {
+	items: IProductItem[];
 	total: number;
 }
 
-export type Order = {
+export interface IOrder {
 	items: string[];
 	payment: string;
 	total: number;
@@ -22,9 +21,9 @@ export type Order = {
 	phone: string;
 }
 
-export type OrderRequest = Order
+export interface IOrderRequest extends IOrder {}
 
-export type OrderResponse = {
+export interface IOrderResponse {
 	id: string;
 	total: number;
 }

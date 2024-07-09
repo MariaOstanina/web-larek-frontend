@@ -1,4 +1,4 @@
-export type OrderForm = {
+export interface IOrderForm {
 	payment: string;
 	address: string;
 	email: string;

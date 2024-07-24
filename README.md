@@ -113,9 +113,10 @@ interface ICartModelConstructor {
 }
 
 interface ICartModel {
-	items: string[]; // возвращает массив ID
+	getItems: string[]; // возвращает массив IDs
     add(id: string): void; // добавляет данные в корзину
     remove(id: string): void; // удаляет данные по ID
+    reset(): void; // очищает корзину
 }
 ```
 
@@ -128,9 +129,9 @@ interface IOrderModelConstructor {
 }
 
 interface IOrderModel {
-    order: IOrder; // возвращает объект заказа
-    addItem(id: string): void; // добавляет данные в заказ
-    resetOrder(): void; // очистка заказа
+    getOrder: IOrder; // возвращает объект заказа
+    change(id: string): void; // изменяет данные заказы
+    reset(): void; // очистка заказа
 }
 ```
 
@@ -147,50 +148,55 @@ interface ICatalogView {
 `CatalogItemView` компонент для отображения продукта в каталоге. По клику открывается модалка с полной карточкой продукта.
 ```ts
 interface ICatalogItemConstructorView {
-    new (data: {
-        onClick: () => void, // коллбэк нажатия на карточку
-        data: IProductItem, // данные карточки
-    }): ICatalogItemView;
+    new (): ICatalogItemView;
 }
 
 interface ICatalogItemView {
-    render(): HTMLElement; // возвращает html элемент карточки каталога
+    render(
+        onClick: () => void, // коллбэк нажатия на карточку
+        data: IProductItem, // данные карточки
+    ): HTMLElement; // возвращает html элемент карточки каталога
 }
 ```
 
-`ProductItemView` компонент для отображения карточки продукта. Имеет кнопку для добавления в корзину.
+`CardPreviewView` компонент для отображения карточки продукта. Имеет кнопку для добавления в корзину.
 ```ts
-interface IProductItemConstructorView {
-    new (data: {
-        addToCart: () => void, // коллбэк добавления карточки в корзину
-        data: IProductItem, // данные карточки каталога
-    }): IProductItemView;
+interface ICardPreviewConstructorView {
+    new (): ICardPreviewView;
 }
 
-interface IProductItemView {
-    render(): HTMLElement; // возвращает html элемент карточки
+interface ICardPreviewView {
+    render(data: {
+       addToCart: () => void, // коллбэк добавления карточки в корзину
+       data: IProductItem, // данные карточки каталога
+       canAddToCart: boolean, // флаг для отображения статуса disabled
+    }): HTMLElement; // возвращает html элемент карточки
 }
 ```
 
 `CartView` компонент для отображения корзины.
 Принимает элементы и встраивает их в DOM.
 ```ts
+interface ICartConstructorView {
+   new (
+        doOrder: () => void // оформление заказа
+   ): ICartView;
+}
+
 interface ICartView {
-    render(items: HTMLElement[]): void; // принимает html элементы корзины и встраивает их в DOM.
+    render(data: { items: HTMLElement[]; price: number }): void;
+    // принимает общую сумму и html элементы корзины и встраивает их в DOM.
 }
 ```
 
 `CartItemView` компонент для отображения добавленного элемента корзины. 
 ```ts
-interface ICartItemConstructorView {
-    new (data: {
-        deleteItem: () => void, // коллбэк удаления элемента из корзины
-        data: IProductItem, // данные элемента корзины
-    }): ICartItemView;
-}
-
 interface ICartItemView {
-    render(): HTMLElement; // возвращает html элемент пункта корзины
+    render(
+      item: ProductItem, // данные элемента корзины
+      index: number, // позиция в корзине
+      onRemove: () => void // коллбэк удаления элемента из корзины
+    ): HTMLElement; // возвращает html элемент пункта корзины
 }
 ```
 
@@ -198,7 +204,7 @@ interface ICartItemView {
 Отображает количество добавленный элементов и при нажатии открывает модальное окно.
 ```ts
 interface ICartButtonConstructorView {
-    new (data: { onClick: () => void }): ICartButtonView;
+    new (onClick: () => void): ICartButtonView;
     // принимает коллбэк клика по элементу
 }
 
@@ -207,18 +213,30 @@ interface ICartButtonView {
 }
 ```
 
-`OrderFormView` компонент отображения формы.
-Получает массив ключей формы и по ним отображает поля.
+`FirstOrderFormView` компонент отображения первого шага формы заказа.
 ```ts
-interface IOrderFormView {
-    render(data: (keyof IOrderForm)[]): HTMLElement; // возвращает html элементы формы по получаемы ключам
+interface IFirstOrderView {
+    render(data: TFirsOrderFormData): HTMLElement; // возвращает html элементы формы
 }
 ```
 
-`SuccessOrder` компонент подтверждения, что заказ выполнен успешно.
+`SecondOrderFormView` компонент отображения второго шага формы заказа.
 ```ts
-interface ISuccessOrder {
-    render(sum: number): HTMLElement; // получает сумму и выводит элемент
+interface ISecondOrderFormConstructorView {
+   new (onClick: () => void): ICartButtonView;
+   // принимает коллбэк клика по элементу
+}
+
+interface ISecondOrderFormView {
+    render(data: TSecondOrderFormData): HTMLElement; // возвращает html элементы формы
+}
+```
+
+`SuccessOrderView` компонент подтверждения, что заказ выполнен успешно.
+```ts
+interface ISuccessOrderView {
+    render(total: number, close: () => void): HTMLElement;
+    // получает коллбэк закрытия модального окна и сумму и выводит элемент
 }
 ```
 
@@ -227,7 +245,7 @@ interface ISuccessOrder {
 interface IModalView {
     // метод открытия модального окна
     // получает заголовок модального окна, контент и кнопку и поэтим данным отображает элемент
-    open(data: { title: string; content: HTMLElement, next?: { onClick: () => void; title: string } }): void;
+    open(data: { content: HTMLElement }): void;
     // закрывает модальное окно
     close(): void;
 }
@@ -281,4 +299,9 @@ export interface IOrderForm {
     email: string;
     phone: string;
 }
+```
+
+```ts
+export type TFirsOrderFormData = Pick<Order, 'payment' | 'address'>
+export type TSecondOrderFormData = Pick<Order, 'email' | 'phone'>
 ```

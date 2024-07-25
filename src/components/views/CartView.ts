@@ -1,4 +1,4 @@
-import { cloneTemplate } from '../utils/utils';
+import { cloneTemplate } from '../../utils/utils';
 
 interface ICartView {
 	render(data: { items: HTMLElement[], price: number }): HTMLElement;

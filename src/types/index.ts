@@ -1,6 +1,6 @@
 import { Order } from './api';
 
-export type TFirsOrderFormData = Pick<Order, 'payment' | 'address'>
-export type TSecondOrderFormData = Pick<Order, 'email' | 'phone'>
+export type TOrderFormData = Pick<Order, 'payment' | 'address'>
+export type TContactsFormData = Pick<Order, 'email' | 'phone'>
 
 export * from './api';

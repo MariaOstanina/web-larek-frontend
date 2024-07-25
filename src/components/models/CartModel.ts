@@ -1,8 +1,9 @@
-import { IEvents } from '../components/base/events';
+import { IEvents } from '../base/events';
 
 interface ICartModel {
 	add(id: string): void;
 	remove(id: string): void;
+  has(id: string): boolean;
 	reset(): void;
 	getItems(): string[]
 }
@@ -22,6 +23,10 @@ export class CartModel implements ICartModel {
   remove(id: string) {
     this.items = this.items.filter(el => el !== id);
     this.cartDataChange();
+  }
+
+  has(id: string) {
+    return this.items.includes(id);
   }
 
   reset() {

@@ -1,11 +1,11 @@
-import { cloneTemplate } from '../utils/utils';
-import { TSecondOrderFormData } from '../types';
+import { cloneTemplate } from '../../utils/utils';
+import { TContactsFormData } from '../../types';
 
-interface ISecondOrderFormView {
-	render(data: TSecondOrderFormData): HTMLElement;
+interface IContactsFormView {
+	render(data: TContactsFormData): HTMLElement;
 }
 
-export class SecondOrderFormView implements ISecondOrderFormView {
+export class ContactsFormView implements IContactsFormView {
   protected element: HTMLFormElement;
   protected formErrors: HTMLFormElement;
   protected payButton: HTMLButtonElement;
@@ -13,14 +13,14 @@ export class SecondOrderFormView implements ISecondOrderFormView {
   protected phoneInput: HTMLInputElement;
 
   protected validate: () => void;
-  protected setValues: (data: TSecondOrderFormData) => void;
+  protected setValues: (data: TContactsFormData) => void;
 
-  protected data: TSecondOrderFormData = {
+  protected data: TContactsFormData = {
     email: '',
     phone: '',
   };
 
-  constructor(onChange: (data: TSecondOrderFormData) => void, pay: () => void) {
+  constructor(onChange: (data: TContactsFormData) => void, pay: () => void) {
     this.element = cloneTemplate('#contacts');
     this.formErrors = this.element.querySelector('.form__errors');
     this.payButton = this.element.querySelector('.button');
@@ -42,7 +42,7 @@ export class SecondOrderFormView implements ISecondOrderFormView {
       }
     };
 
-    this.setValues = (data: TSecondOrderFormData) => {
+    this.setValues = (data: TContactsFormData) => {
       this.emailInput.value = data.email;
       this.phoneInput.value = data.phone;
       this.data = data;
@@ -54,14 +54,14 @@ export class SecondOrderFormView implements ISecondOrderFormView {
     [this.emailInput, this.phoneInput].forEach(el => {
       el.addEventListener('input', (e) => {
         const target = (e.target as HTMLInputElement);
-        this.data[target.name as keyof TSecondOrderFormData] = target.value;
+        this.data[target.name as keyof TContactsFormData] = target.value;
         onChange(this.data);
         this.validate();
       });
     });
   }
 
-  render(data: TSecondOrderFormData) {
+  render(data: TContactsFormData) {
     this.setValues(data);
     return this.element;
   }

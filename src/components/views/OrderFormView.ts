@@ -1,11 +1,11 @@
-import { cloneTemplate } from '../utils/utils';
-import { TFirsOrderFormData } from '../types';
+import { cloneTemplate } from '../../utils/utils';
+import { TOrderFormData } from '../../types';
 
-interface IFirstOrderFormView {
-	render(data?: TFirsOrderFormData): HTMLElement;
+interface IOrderFormView {
+	render(data?: TOrderFormData): HTMLElement;
 }
 
-export class FirstOrderFormView implements IFirstOrderFormView {
+export class OrderFormView implements IOrderFormView {
   protected element: HTMLFormElement;
   protected paymentButtonsWrapper: HTMLFormElement;
   protected paymentButtons: NodeListOf<HTMLButtonElement>;
@@ -13,15 +13,15 @@ export class FirstOrderFormView implements IFirstOrderFormView {
   protected nextButton: HTMLFormElement;
   protected addressInput: HTMLInputElement;
 
-  protected data: TFirsOrderFormData = {
+  protected data: TOrderFormData = {
     payment: 'card',
     address: '',
   };
 
   protected validate: () => void;
-  protected setValues: (data: TFirsOrderFormData) => void;
+  protected setValues: (data: TOrderFormData) => void;
 
-  constructor(onChange: (data: TFirsOrderFormData) => void, next: () => void) {
+  constructor(onChange: (data: TOrderFormData) => void, next: () => void) {
     this.element = cloneTemplate('#order');
     this.formErrors = this.element.querySelector('.form__errors');
     this.nextButton = this.element.querySelector('.order__button');
@@ -41,7 +41,7 @@ export class FirstOrderFormView implements IFirstOrderFormView {
       }
     };
 
-    this.setValues = (data: TFirsOrderFormData) => {
+    this.setValues = (data: TOrderFormData) => {
       this.addressInput.value = data.address;
       this.paymentButtons.forEach(btn => {
         if (btn.name === data.payment) {
@@ -80,7 +80,7 @@ export class FirstOrderFormView implements IFirstOrderFormView {
     });
   }
 
-  render(data: TFirsOrderFormData) {
+  render(data: TOrderFormData) {
     this.setValues(data);
     return this.element;
   }

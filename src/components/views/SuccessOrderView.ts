@@ -1,4 +1,4 @@
-import { cloneTemplate } from '../utils/utils';
+import { cloneTemplate } from '../../utils/utils';
 
 interface ISuccessOrderView {
 	render(total: number, close: () => void): HTMLElement;

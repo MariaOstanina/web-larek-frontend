@@ -1,12 +1,12 @@
-import { ProductItem } from '../types';
-import { CATEGORY_TO_CLASS, CDN_URL } from '../utils/constants';
-import { cloneTemplate } from '../utils/utils';
+import { ProductItem } from '../../types';
+import { CATEGORY_TO_CLASS, CDN_URL } from '../../utils/constants';
+import { cloneTemplate } from '../../utils/utils';
 
 interface ICardPreviewView {
 	render(arg: {
 		addToCart: () => void,
 		data: ProductItem,
-		canAddToCart: boolean,
+		getCanAddToCart: () => boolean,
 	}): HTMLElement;
 }
 
@@ -33,7 +33,7 @@ export class CardPreviewView implements ICardPreviewView {
     this.cardBtn = this.element.querySelector('.card__button');
   }
 
-  render({ data, addToCart, canAddToCart }: Parameters<ICardPreviewView['render']>[0]) {
+  render({ data, addToCart, getCanAddToCart }: Parameters<ICardPreviewView['render']>[0]) {
     this.image.src = CDN_URL + data.image;
     this.title.textContent = data.title;
     this.category.textContent = data.category;
@@ -45,12 +45,12 @@ export class CardPreviewView implements ICardPreviewView {
 
     this.cardBtn.removeEventListener('click', this.addToCart);
     this.addToCart = () => {
-      if (this.cardBtn.disabled) return;
+      if (!getCanAddToCart()) return;
       addToCart();
       this.cardBtn.disabled = true;
     };
     this.cardBtn.addEventListener('click', this.addToCart);
-    this.cardBtn.disabled = data.price === null || !canAddToCart;
+    this.cardBtn.disabled = data.price === null || !getCanAddToCart();
 
     return this.element;
   }

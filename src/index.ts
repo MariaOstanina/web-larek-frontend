@@ -2,20 +2,20 @@ import './scss/styles.scss';
 import { EventEmitter } from './components/base/events';
 import { Api } from './components/base/api';
 import { API_URL } from './utils/constants';
-import { CatalogModel } from './models/CatalogModel';
-import { CatalogView } from './views/CatalogView';
-import { CatalogItemView } from './views/CatalogItemView';
+import { CatalogModel } from './components/models/CatalogModel';
+import { CatalogView } from './components/views/CatalogView';
+import { CatalogItemView } from './components/views/CatalogItemView';
 import { OrderResponse, ProductItem, ProductResponse } from './types';
-import { CardPreviewView } from './views/CardPreviewView';
-import { ModalView } from './views/ModalView';
-import { CartButtonView } from './views/CartButtonView';
-import { CartModel } from './models/CartModel';
-import { CartView } from './views/CartView';
-import { CartItemView } from './views/CartItemView';
-import { FirstOrderFormView } from './views/FirstOrderFormView';
-import { SecondOrderFormView } from './views/SecondOrderFormView';
-import { OrderModel } from './models/OrderModel';
-import { SuccessOrderView } from './views/SuccessOrderView';
+import { CardPreviewView } from './components/views/CardPreviewView';
+import { ModalView } from './components/views/ModalView';
+import { CartButtonView } from './components/views/CartButtonView';
+import { CartModel } from './components/models/CartModel';
+import { CartView } from './components/views/CartView';
+import { CartItemView } from './components/views/CartItemView';
+import { OrderFormView } from './components/views/OrderFormView';
+import { ContactsFormView } from './components/views/ContactsFormView';
+import { OrderModel } from './components/models/OrderModel';
+import { SuccessOrderView } from './components/views/SuccessOrderView';
 
 const api = new Api(API_URL);
 const events = new EventEmitter();
@@ -37,7 +37,8 @@ const payOrder = () => {
       orderModel.reset();
       cartModel.reset();
       modalView.open({ content: successOrderView.render(total, () => modalView.close()) });
-    });
+    })
+    .catch(console.error);
 };
 
 const getFullCartData = () => {
@@ -48,25 +49,25 @@ const getFullCartData = () => {
   };
 };
 
-const secondOrderFormView = new SecondOrderFormView((d) => orderModel.change(d), payOrder);
+const contactsFormView = new ContactsFormView((d) => orderModel.change(d), payOrder);
 
 const openSecondFormModal = () => {
   const orderData = orderModel.getOrder();
   modalView.open({
-    content: secondOrderFormView.render({
+    content: contactsFormView.render({
       email: orderData.email,
       phone: orderData.phone
     })
   });
 };
 
-const firstOrderFormView = new FirstOrderFormView((d) => orderModel.change(d), openSecondFormModal);
+const orderFormView = new OrderFormView((d) => orderModel.change(d), openSecondFormModal);
 
 const doOrder = () => {
   orderModel.change({ items: cartModel.getItems(), total: getFullCartData().total });
   const orderData = orderModel.getOrder();
   modalView.open({
-    content: firstOrderFormView.render({
+    content: orderFormView.render({
       payment: orderData.payment,
       address: orderData.address
     })
@@ -97,9 +98,11 @@ const cartButtonView = new CartButtonView(
   })
 );
 
-api.get('/product').then((res: ProductResponse) => {
-  catalogModel.setItems(res.items);
-});
+api.get('/product')
+  .then((res: ProductResponse) => {
+    catalogModel.setItems(res.items);
+  })
+  .catch(console.error);
 
 events.on('cart-change', ({ items }: { items: string[] }) => {
   cartButtonView.render(items.length);
@@ -111,8 +114,8 @@ const renderCatalog = ({ items = [] }: { items: ProductItem[] }) => {
     const addToCart = () => cartModel.add(data.id);
 
     const onClick = () => {
-      const canAddToCart = !cartModel.getItems().includes(data.id);
-      modalView.open({ content: cardPreviewView.render({ data, addToCart, canAddToCart }) });
+      const getCanAddToCart = () => !cartModel.has(data.id);
+      modalView.open({ content: cardPreviewView.render({ data, addToCart, getCanAddToCart }) });
     };
     return catalogItemView.render(onClick, data);
   });

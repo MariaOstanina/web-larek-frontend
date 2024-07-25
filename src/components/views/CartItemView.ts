@@ -1,5 +1,5 @@
-import { ProductItem } from '../types';
-import { cloneTemplate } from '../utils/utils';
+import { ProductItem } from '../../types';
+import { cloneTemplate } from '../../utils/utils';
 
 interface ICartItemView {
 	render(item: ProductItem, index: number, onRemove: () => void): void;

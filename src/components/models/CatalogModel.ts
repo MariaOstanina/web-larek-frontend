@@ -1,5 +1,5 @@
-import { ProductItem } from '../types';
-import { IEvents } from '../components/base/events';
+import { ProductItem } from '../../types';
+import { IEvents } from '../base/events';
 
 interface ICatalogModel {
 	items: ProductItem[];

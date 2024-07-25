@@ -1,6 +1,6 @@
-import { ProductItem } from '../types';
-import { CATEGORY_TO_CLASS, CDN_URL } from '../utils/constants';
-import { cloneTemplate } from '../utils/utils';
+import { ProductItem } from '../../types';
+import { CATEGORY_TO_CLASS, CDN_URL } from '../../utils/constants';
+import { cloneTemplate } from '../../utils/utils';
 
 interface ICatalogItemView {
 	render(onClick: () => void, data: ProductItem): HTMLElement;

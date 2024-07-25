@@ -115,6 +115,7 @@ interface ICartModelConstructor {
 interface ICartModel {
 	getItems: string[]; // возвращает массив IDs
     add(id: string): void; // добавляет данные в корзину
+    has(id: string): boolean; // проверяет наличие в корзине
     remove(id: string): void; // удаляет данные по ID
     reset(): void; // очищает корзину
 }
@@ -169,7 +170,7 @@ interface ICardPreviewView {
     render(data: {
        addToCart: () => void, // коллбэк добавления карточки в корзину
        data: IProductItem, // данные карточки каталога
-       canAddToCart: boolean, // флаг для отображения статуса disabled
+       getCanAddToCart: () => boolean, // проверка возможности добавления в корзину
     }): HTMLElement; // возвращает html элемент карточки
 }
 ```
@@ -213,22 +214,22 @@ interface ICartButtonView {
 }
 ```
 
-`FirstOrderFormView` компонент отображения первого шага формы заказа.
+`OrderFormView` компонент отображения первого шага формы заказа.
 ```ts
-interface IFirstOrderView {
-    render(data: TFirsOrderFormData): HTMLElement; // возвращает html элементы формы
+interface IOrderFormView {
+    render(data: TOrderFormData): HTMLElement; // возвращает html элементы формы
 }
 ```
 
-`SecondOrderFormView` компонент отображения второго шага формы заказа.
+`ContactsFormView` компонент отображения второго шага формы заказа.
 ```ts
-interface ISecondOrderFormConstructorView {
+interface IContactsFormConstructorView {
    new (onClick: () => void): ICartButtonView;
    // принимает коллбэк клика по элементу
 }
 
-interface ISecondOrderFormView {
-    render(data: TSecondOrderFormData): HTMLElement; // возвращает html элементы формы
+interface IContactsFormView {
+    render(data: TContactsFormData): HTMLElement; // возвращает html элементы формы
 }
 ```
 
@@ -302,6 +303,6 @@ export interface IOrderForm {
 ```
 
 ```ts
-export type TFirsOrderFormData = Pick<Order, 'payment' | 'address'>
-export type TSecondOrderFormData = Pick<Order, 'email' | 'phone'>
+export type TOrderFormData = Pick<Order, 'payment' | 'address'>
+export type TContactsFormData = Pick<Order, 'email' | 'phone'>
 ```
